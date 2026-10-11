@@ -1,0 +1,39 @@
+INFRARMONICO COM FILTRO ESTABILIZADOR MDC
+
+import numpy as np
+from math import gcd
+from functools import reduce
+
+# --- Funções permanecem iguais, mudamos a lógica de L e D ---
+def mdc_lista(denominadores): return reduce(gcd, denominadores)
+def entropia_discreta(f):
+    p = f / np.sum(f)
+    p = p[p > 0]
+    return -np.sum(p * np.log(p))
+
+D = 12  # Forçamos um D maior para ver a dinâmica
+f_t = np.zeros(D)
+f_t[0] = 1.0; f_t[1] = 0.5 # Estado inicial assimétrico
+
+# OPERADOR DE PERMUTAÇÃO: Desloca o vetor em 1 posição a cada t
+L = np.zeros(D)
+L[1] = 1.0  # Isso gera um ciclo puro
+
+historia = [f_t.copy()]
+entropias = [entropia_discreta(f_t)]
+ciclos = {}
+
+for t in range(1, 25):
+    # Convolução modular (equivalente a np.roll se L for permutação)
+    f_novo = np.roll(f_t, 1) 
+    
+    for s, f_ant in enumerate(historia):
+        if np.allclose(f_novo, f_ant, atol=1e-8):
+            if t not in ciclos: ciclos[t] = t - s
+    
+    f_t = f_novo
+    historia.append(f_t.copy())
+    entropias.append(entropia_discreta(f_t))
+
+print(f"Ciclos detectados: {ciclos}")
+print(f"Entropia inicial: {entropias[0]:.4f}, Entropia final: {entropias[-1]:.4f}")
