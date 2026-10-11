@@ -1,0 +1,26 @@
+INFRARMONICOS HOMEOSTATICA MMC/MDC
+
+def mmc(a, b): return abs(a * b) // gcd(a, b)
+def mmc_lista(denominadores): return reduce(mmc, denominadores)
+
+denominadores = [4, 6, 8]
+D_mmc = mmc_lista(denominadores) # Retornará 24
+
+print(f"D original (MDC): 2")
+print(f"D novo (MMC): {D_mmc}")
+
+# Inicializando com o novo D
+f0_mmc = np.zeros(D_mmc)
+f0_mmc[0] = 1.0 # Pulso unitário no novo espaço
+
+# L aleatório para ver convergência no espaço expandido
+L_mmc = np.random.rand(D_mmc)
+L_mmc /= L_mmc.sum()
+
+# Simulação rápida
+f_t = f0_mmc.copy()
+for t in range(50):
+    f_t = np.convolve(f_t, L_mmc, mode='same') # Exemplo de dispersão
+    f_t /= f_t.sum() # Mantém normalizado
+
+print(f"Vetor final em D={D_mmc} estabilizado.")
